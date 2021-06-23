@@ -1,0 +1,6 @@
+aicv115m_public_test.zip
+aicv115m_public_train.zip
+venv/
+.idea/
+aicv115m_public_train/train_audio_files_8k.zip
+aicv115m_public_test/public_test_audio_files_8k.zip
