@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import librosa.display
 import numpy as np
 import pandas as pd
@@ -6,6 +5,12 @@ import pandas as pd
 
 def lib_chroma_stft(_y, _sr, _round):
     return np.round(np.mean(librosa.feature.chroma_stft(y=_y, sr=_sr)), _round)
+
+
+def lib_chroma_stft_vector(_y, _sr, _round):
+    chroma = librosa.feature.chroma_stft(y=_y, sr=_sr)
+    chroma -= np.mean(chroma, axis=0) + 1e-8
+    return np.round(np.mean(chroma, 1), _round)
 
 
 def lib_spectral_centroid(_y, _sr, _round):
@@ -29,7 +34,9 @@ def lib_zero_crossing_rate(_y, _round):
 
 
 def lib_mfcc(_y, _sr, _round):
-    return np.round(np.mean(librosa.feature.mfcc(y=_y, sr=_sr, n_mfcc=20), 1), _round)
+    mfc = librosa.feature.mfcc(y=_y, sr=_sr, n_mfcc=20)
+    mfc -= np.mean(mfc, axis=0) + 1e-8
+    return np.round(np.mean(mfc, 1), _round)
 
 
 def concat_lib(stft, rms, cent, band, roll, zero, mfcc):
@@ -53,7 +60,7 @@ def audio_data_wav(root, audio, name):
     return librosa.load(root + '/' + audio + '/' + name)
 
 
-def save_to_csv(data):
+def save_to_csv(data, save_file):
     print(len(data[0]))
     df = pd.DataFrame(data, columns=['chroma_stft',
                                      'rms',
@@ -83,7 +90,7 @@ def save_to_csv(data):
                                      'mfcc20',
                                      'label',
                                      ])
-    df.to_csv('data-set.csv', index=True, header=True, index_label='uid')
+    df.to_csv(save_file, index=True, header=True, index_label='uid')
     print(df)
     pass
 
@@ -113,15 +120,28 @@ def get_data_lib(root, audio, filesname, label):
     return data
 
 
-if __name__ == '__main__':
+def save_data_csv(_root, _audio, _file, _save_file):
+    data_frame = load_data_csv(_root, _file)
+    files_name, label = get_data_file_name_and_label(data_frame)
+    data_set = get_data_lib(_root, _audio, files_name, label)
+    save_to_csv(data_set, _save_file)
+    pass
 
+
+if __name__ == '__main__':
+    # train
     root_train = 'aicv115m_public_train'
     audio_train = 'train_audio_files_8k'
     file_train = 'metadata_train_challenge.csv'
-    data_frame = load_data_csv(root_train, file_train)
-    files_name, label = get_data_file_name_and_label(data_frame)
-    data_set = get_data_lib(root_train, audio_train, files_name, label)
-    save_to_csv(data_set)
+    save_file_train = 'data_source/data-train-mfccs-mean.csv'
+    # test
+    root_test = 'aicv115m_public_test'
+    audio_test = 'public_test_audio_files_8k'
+    file_test = 'metadata_public_test.csv'
+    save_file_test = 'data_source/data-test-mfccs-mean.csv'
+
+    save_data_csv(root_train, audio_train, file_train, save_file_train)
+    save_data_csv(root_test, audio_test, file_test, save_file_test)
 
 
 
