@@ -1,6 +1,7 @@
 import librosa.display
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def lib_chroma_stft(_y, _sr, _round):
@@ -10,7 +11,7 @@ def lib_chroma_stft(_y, _sr, _round):
 def lib_chroma_stft_vector(_y, _sr, _round):
     chroma = librosa.feature.chroma_stft(y=_y, sr=_sr)
     chroma -= np.mean(chroma, axis=0) + 1e-8
-    return np.round(np.mean(chroma, 1), _round)
+    return chroma
 
 
 def lib_spectral_centroid(_y, _sr, _round):
@@ -31,6 +32,12 @@ def lib_spectral_rolloff(_y, _sr, _round):
 
 def lib_zero_crossing_rate(_y, _round):
     return np.round(np.mean(librosa.feature.zero_crossing_rate(_y)[0]), _round)
+
+
+def lib_mfc_matrix(_y, _sr, _round):
+    mfc = librosa.feature.mfcc(y=_y, sr=_sr, n_mfcc=20)
+    mfc -= np.mean(mfc, axis=0) + 1e-8
+    return mfc
 
 
 def lib_mfcc(_y, _sr, _round):
@@ -120,11 +127,38 @@ def get_data_lib(root, audio, filesname, label):
     return data
 
 
+def get_data_lib_image_mfc(root, audio, filesname):
+    data = []
+    for i in range(0, len(filesname)):
+        _x, _sr = audio_data_wav(root, audio, filesname[i])
+        _round = 6
+        _mfc = lib_mfc_matrix(_x, _sr, _round)
+        data.append(_mfc)
+    return data
+
+
 def save_data_csv(_root, _audio, _file, _save_file):
     data_frame = load_data_csv(_root, _file)
     files_name, label = get_data_file_name_and_label(data_frame)
     data_set = get_data_lib(_root, _audio, files_name, label)
     save_to_csv(data_set, _save_file)
+    pass
+
+
+def show_image_mfccs(_mfccs):
+    fig, ax = plt.subplots()
+    img = librosa.display.specshow(_mfccs, x_axis='time', ax=ax)
+    fig.colorbar(img, ax=ax)
+    ax.set(title='MFCC')
+    pass
+
+
+def save_data_image_mfccs(_root, _audio, _file, _save_file):
+    data_frame = load_data_csv(_root, _file)
+    files_name, label = get_data_file_name_and_label(data_frame)
+    data_mfc = get_data_lib_image_mfc(_root, _audio, files_name)
+    print(data_mfc[0])
+
     pass
 
 
@@ -134,17 +168,17 @@ if __name__ == '__main__':
     audio_train = 'train_audio_files_8k'
     file_train = 'metadata_train_challenge.csv'
     save_file_train = 'data_source/data-train-mfccs-mean.csv'
+    save_folder_image_train = 'data_source/mfc-image-train/'
     # test
     root_test = 'aicv115m_public_test'
     audio_test = 'public_test_audio_files_8k'
     file_test = 'metadata_public_test.csv'
     save_file_test = 'data_source/data-test-mfccs-mean.csv'
 
-    save_data_csv(root_train, audio_train, file_train, save_file_train)
-    save_data_csv(root_test, audio_test, file_test, save_file_test)
+    # save_data_csv(root_train, audio_train, file_train, save_file_train)
+    # save_data_csv(root_test, audio_test, file_test, save_file_test)
 
-
-
+    save_data_image_mfccs(root_train, audio_train, file_train, save_folder_image_train)
 
 
     pass

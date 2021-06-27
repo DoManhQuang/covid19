@@ -1,3 +1,6 @@
+opencv-python
+pyyaml h5py
+tensorflow
 numpy
 pandas
 matplotlib

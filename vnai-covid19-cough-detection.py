@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
+import matplotlib.pyplot as plt
 
 
 def load_data_train(_root, _name):
@@ -16,22 +17,22 @@ def load_data_train(_root, _name):
                                              'mfcc3',
                                              'mfcc4',
                                              'mfcc5',
-                                             # 'mfcc6',
-                                             # 'mfcc7',
-                                             # 'mfcc8',
-                                             # 'mfcc9',
-                                             # 'mfcc10',
-                                             # 'mfcc11',
-                                             # 'mfcc12',
-                                             # 'mfcc13',
-                                             # 'mfcc14',
-                                             # 'mfcc15',
-                                             # 'mfcc16',
-                                             # 'mfcc17',
-                                             # 'mfcc18',
-                                             # 'mfcc19',
-                                             # 'mfcc20',
-                                                              ])), \
+                                             'mfcc6',
+                                             'mfcc7',
+                                             'mfcc8',
+                                             'mfcc9',
+                                             'mfcc10',
+                                             'mfcc11',
+                                             'mfcc12',
+                                             'mfcc13',
+                                             'mfcc14',
+                                             'mfcc15',
+                                             'mfcc16',
+                                             'mfcc17',
+                                             'mfcc18',
+                                             'mfcc19',
+                                             'mfcc20',
+                                                    ])), \
            np.array(pd.read_csv(_root + '/' + _name, usecols=['label'])).T[0], \
            np.array(pd.read_csv(_root + '/' + _name, usecols=['uid'])).T[0]
 
@@ -48,21 +49,21 @@ def load_data_test(_root, _name):
                                                               'mfcc3',
                                                               'mfcc4',
                                                               'mfcc5',
-                                                              # 'mfcc6',
-                                                              # 'mfcc7',
-                                                              # 'mfcc8',
-                                                              # 'mfcc9',
-                                                              # 'mfcc10',
-                                                              # 'mfcc11',
-                                                              # 'mfcc12',
-                                                              # 'mfcc13',
-                                                              # 'mfcc14',
-                                                              # 'mfcc15',
-                                                              # 'mfcc16',
-                                                              # 'mfcc17',
-                                                              # 'mfcc18',
-                                                              # 'mfcc19',
-                                                              # 'mfcc20',
+                                                              'mfcc6',
+                                                              'mfcc7',
+                                                              'mfcc8',
+                                                              'mfcc9',
+                                                              'mfcc10',
+                                                              'mfcc11',
+                                                              'mfcc12',
+                                                              'mfcc13',
+                                                              'mfcc14',
+                                                              'mfcc15',
+                                                              'mfcc16',
+                                                              'mfcc17',
+                                                              'mfcc18',
+                                                              'mfcc19',
+                                                              'mfcc20',
                                                               ]))
 
 
@@ -93,6 +94,14 @@ if __name__ == '__main__':
     file_name_test = 'data-test-mfccs-mean.csv'
     X_data, y_label, uid = load_data_train(root, file_name_train)
     X_test = load_data_test(root, file_name_test)
+    time = range(len(X_data[0]))
+    s = np.fft.ifft(X_data[0])
+    plt.plot(time, s.real, label='real')
+    plt.plot(time, s.imag, '--', label='imaginary')
+    plt.legend()
+    plt.show()
+
+
 
 
 
